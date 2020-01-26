@@ -46,12 +46,12 @@ member_by_if(X, [Y|RS]) :-
     ).
 
 % Number of occurences of an integer in a list
-occurrences([], _, O) :-
-    O is 0.
+occurrences([], _, 0).
 occurrences([I|T], I, O) :-
     occurrences(T, I, P),
     O is P+1.
-occurrences([_|T], I, O) :-
+occurrences([H|T], I, O) :-
+    H=\=I,
     occurrences(T, I, O).
 
 % Length of a list
@@ -413,6 +413,47 @@ remove_at([_|XT], K, L, YT) :-
     M is L+1,
     remove_at(XT, K, M, YT).
 
+% Rotate a list n places (+ rotates to the right, - rotates to the left)
+rotate(X, N, Y) :-
+    N=<0,
+    N1 is abs(N),
+    prefix(X, N1, P),
+    list_length(X, L),
+    M is L-N1,
+    suffix(X, M, S),
+    append(S, P, Y).
+rotate(X, N, Y) :-
+    N>0,
+    suffix(X, N, S),
+    list_length(X, L),
+    M is L-N,
+    prefix(X, M, P),
+    append(S, P, Y).
+
+% Drop every n-th element of a list
+drop(X, N, Y) :-
+    drop(X, N, 1, Y).
+
+drop([], _, _, []).
+drop([H|T], N, K, [H|Y]) :-
+    N=\=K,
+    M is K+1,
+    drop(T, N, M, Y).
+drop([_|T], N, N, Y) :-
+    drop(T, N, 1, Y).
+
+% Check if a list is a sublist of another list (generate every combination of the elements of a list)
+sublist(_, []).
+sublist([H|XT], [H|YT]) :-
+    sublist(XT, YT).
+sublist([_|XT], Y) :-
+    sublist(XT, Y).
+
+% Generate the combinations of k distinct objects chosen from the N elements of a list
+combination(X, K, Y) :-
+    sublist(X, Y),
+    length(Y, K).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%% SET / QUEUE %%%%%%%%%%%%%%%%%%%
@@ -426,6 +467,12 @@ set([H|T], [H|S]) :-
     set(T, S).
 set([_|T], S) :-
     set(T, S).
+
+% Check if a set is a subset of another set
+subset(_, []).
+subset(L, [H|T]) :-
+    member(H, L),
+    subset(L, T).
 
 % Queue type
 queue(L) :-
