@@ -76,13 +76,12 @@ last_by_reverse(X, L) :-
     first(R, L).
 
 % Concatenation of lists
-append([], Y, Y).
-append([XH|XT], Y, [XH|Z]) :-
-    append(XT, Y, Z).
+my_append([], Y, Y).
+my_append([XH|XT], Y, [XH|Z]) :-
+    my_append(XT, Y, Z).
 
 % Sum of integers in a list
-list_sum([], L) :-
-    L is 0.
+list_sum([], 0).
 list_sum([H|T], L) :-
     list_sum(T, M),
     L is M+H.
@@ -91,7 +90,7 @@ list_sum([H|T], L) :-
 reverse([], []).
 reverse([XH|XT], Y) :-
     reverse(XT, Z),
-    append(Z, [XH], Y).
+    my_append(Z, [XH], Y).
 
 % Lists elementwise difference
 elementwise_diff([], [], []).
@@ -100,8 +99,7 @@ elementwise_diff([XH|XT], [YH|YT], [D|Z]) :-
     elementwise_diff(XT, YT, Z).
 
 % List euclidean norm
-squared_euclidean_norm([], N) :-
-    N is 0.
+squared_euclidean_norm([], 0).
 squared_euclidean_norm([H|T], N) :-
     squared_euclidean_norm(T, O),
     N is O+H*H.
@@ -111,8 +109,7 @@ euclidean_norm(X, N) :-
     N is sqrt(V).
 
 % Find an occurrence of an element in a list and remove it
-select(X, [X|T], T) :-
-    !.
+select(X, [X|T], T).
 select(X, [H|T1], [H|T2]) :-
     select(X, T1, T2).
 
@@ -131,7 +128,7 @@ remove_prefix(X, N, Y) :-
     T is L-N,
     T>=0,
     list_length(Y, T),
-    append(_, Y, X),
+    my_append(_, Y, X),
     !.
 
 % Remove the last N elements from a list
@@ -140,7 +137,7 @@ remove_suffix(X, N, Y) :-
     T is L-N,
     T>=0,
     list_length(Y, T),
-    append(Y, _, X),
+    my_append(Y, _, X),
     !.
 
 % Split a list into two lists of equal length
@@ -164,8 +161,8 @@ ordered([H|T]) :-
 permutation([], []) :-
     !.
 permutation(X, [H|T]) :-
-    append(V, [H|U], X),
-    append(V, U, W),
+    my_append(V, [H|U], X),
+    my_append(V, U, W),
     permutation(W, T).
 
 % Get the first N elements of a list
@@ -251,7 +248,7 @@ positive_integers([], []) :-
 positive_integers([H|T], X) :-
     H>=0,
     positive_integers(T, Y),
-    append([H], Y, X).
+    my_append([H], Y, X).
 positive_integers([H|T], X) :-
     H<0,
     positive_integers(T, X),
@@ -272,7 +269,7 @@ palindrome(X) :-
 flatten([X|L], F) :-
     flatten(X, F1),
     flatten(L, F2),
-    append(F1, F2, F),
+    my_append(F1, F2, F),
     !.
 flatten(X, [X]) :-
     not(list(X)).
@@ -289,9 +286,9 @@ bogo_sort(X, S) :-
 bubble_sort(L, L) :-
     ordered(L).
 bubble_sort(L1, L2) :-
-    append(X, [A, B|Y], L1),
+    my_append(X, [A, B|Y], L1),
     A>B,
-    append(X, [B, A|Y], T),
+    my_append(X, [B, A|Y], T),
     bubble_sort(T, L2),
     !.
 
@@ -340,7 +337,7 @@ pack([H, H|T], L, Y) :-
 pack([H, F|T], L, Y) :-
     H=\=F,
     pack([F|T], [], Z),
-    append([[H|L]], Z, Y).
+    my_append([[H|L]], Z, Y).
 
 % Run-length encoding of a list
 rl_encode(X, Y) :-
@@ -350,7 +347,7 @@ encode([], []).
 encode([[H|T1]|T2], Y) :-
     length([H|T1], L),
     encode(T2, Z),
-    append([[H, L]], Z, Y).
+    my_append([[H, L]], Z, Y).
 
 % Modified run-length encoding of a list
 mrl_encode(X, Y) :-
@@ -361,18 +358,18 @@ mod_encode([[H|T1]|T2], Y) :-
     length([H|T1], L),
     mod_encode(T2, Z),
     L>1,
-    append([[H, L]], Z, Y).
+    my_append([[H, L]], Z, Y).
 mod_encode([[H|T1]|T2], Y) :-
     length([H|T1], L),
     mod_encode(T2, Z),
     L is 1,
-    append([H], Z, Y).
+    my_append([H], Z, Y).
 
 % Duplicate the elements of a list
 dupli([], []).
 dupli([H|T], Y) :-
     dupli(T, Z),
-    append([H, H], Z, Y).
+    my_append([H, H], Z, Y).
 
 % Duplicate the elements of a list a given number of times
 dupli(X, N, Y) :-
@@ -421,14 +418,14 @@ rotate(X, N, Y) :-
     list_length(X, L),
     M is L-N1,
     suffix(X, M, S),
-    append(S, P, Y).
+    my_append(S, P, Y).
 rotate(X, N, Y) :-
     N>0,
     suffix(X, N, S),
     list_length(X, L),
     M is L-N,
     prefix(X, M, P),
-    append(S, P, Y).
+    my_append(S, P, Y).
 
 % Drop every n-th element of a list
 drop(X, N, Y) :-
@@ -453,6 +450,17 @@ sublist([_|XT], Y) :-
 combination(X, K, Y) :-
     sublist(X, Y),
     length(Y, K).
+
+% Find the k-th element of a list
+element_at(X, K, E) :-
+    element_at(X, K, 0, E).
+
+element_at([], _, _, nil).
+element_at([H|_], K, K, H).
+element_at([_|T], K, N, E) :-
+    N=\=K,
+    M is N+1,
+    element_at(T, K, M, E).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -481,7 +489,7 @@ queue(L) :-
 % Enqueue operation
 enqueue(queue(Q1), E, queue(Q2)) :-
     not(queue(E)),
-    append(Q1, [E], Q2),
+    my_append(Q1, [E], Q2),
     !.
 
 % Dequeue operation
@@ -507,22 +515,22 @@ empty(void).
 inorder(tree(E, L, R), V) :-
     inorder(L, X),
     inorder(R, Y),
-    append(X, [E|Y], V).
+    my_append(X, [E|Y], V).
 inorder(void, []).
 
 % Pre-order visit of a binary tree (Root, Left, Right)
 preorder(tree(E, L, R), V) :-
     preorder(L, X),
     preorder(R, Y),
-    append([E|X], Y, V).
+    my_append([E|X], Y, V).
 preorder(void, []).
 
 % Post-order visit of a binary tree (Left, Right, Root)
 postorder(tree(E, L, R), V) :-
     postorder(R, Y),
     postorder(L, X),
-    append(X, Y, Z),
-    append(Z, [E], V).
+    my_append(X, Y, Z),
+    my_append(Z, [E], V).
 postorder(void, []).
 
 % Sum of the integer nodes of a binary tree
@@ -545,7 +553,7 @@ leaves(tree(L, void, void), [L]) :-
 leaves(tree(_, L, R), S) :-
     leaves(L, LS),
     leaves(R, RS),
-    append(LS, RS, S).
+    my_append(LS, RS, S).
 leaves(void, []).
 
 % Get the internal nodes of a binary tree
@@ -557,14 +565,14 @@ internals(tree(E, L, R), S) :-
     not((   empty(L)
         ;   empty(R)
         )),
-    append([E|LS], RS, S).
+    my_append([E|LS], RS, S).
 internals(void, []).
 
 % Get every node of a binary tree as a list
 nodes(tree(E, L, R), N) :-
     internals(tree(E, L, R), X),
     leaves(tree(E, L, R), Y),
-    append(X, Y, S),
+    my_append(X, Y, S),
     permutation(S, N),
     !.
 
@@ -592,6 +600,6 @@ nodes_at_level(tree(_, L, R), N, H) :-
     M is N-1,
     nodes_at_level(L, M, LH),
     nodes_at_level(R, M, RH),
-    append(LH, RH, H),
+    my_append(LH, RH, H),
     !.
 nodes_at_level(void, _, []).
