@@ -119,6 +119,11 @@ solve_print_tab(A, D) :-
 	solve_print_tab(B, D1),
 	tab(D1), write('Solved: '), write(B), nl.
 
+% Meta-interpreter that returns the list of sub-goals
+solve_sub(true, []) :- !. 
+solve_sub((A,B), S) :- !, solve_sub(A, S1), solve_sub(B, S2), append(S1, S2, S).
+solve_sub(A, [A|T]) :- clause(A,B), solve_sub(B, T).
+
 % Dinamically modify the KB (It alters its declarative semantic)
 % assert(T). (Clause T is added in an unspecified position in the KB)
 % asserta(T). (Clause T is added at the top of the KB)
@@ -147,3 +152,15 @@ e --> t, plus, e.
 e --> t.
 t --> [a]. 
 plus --> [+].
+
+% Palindrome grammar (DCG)
+start_dcg --> [a], start_dcg, [a].
+start_dcg --> [b], start_dcg, [b].
+start_dcg --> [].
+
+% Palindrome grammar (Standard Prolog)
+start_std(I, O) :- letter_a(I, T1), start_std(T1, T2), letter_a(T2, O).
+start_std(I, O) :- letter_b(I, T1), start_std(T1, T2), letter_b(T2, O).
+start_std(H, H). % This is the empty production
+letter_a([a|T], T).
+letter_b([b|T], T).

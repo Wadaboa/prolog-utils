@@ -462,6 +462,31 @@ element_at([_|T], K, N, E) :-
     M is N+1,
     element_at(T, K, M, E).
 
+% Check if X is the N-th element of the given list
+nth(N, [H|T], X) :- nth(N, [H|T], X, 1).
+nth(N, [X|_], X, I) :- I is N, !.
+nth(N, [_|T], X, I) :- I1 is I + 1, nth(N, T, X, I1).
+
+% Remove empty-lists from the given list
+remove_nil([], []).
+remove_nil([[]], []).
+remove_nil([[],H1|T1], [H1|T2]) :- remove_nil(T1, T2).
+remove_nil([H1|T1], [H1|T2]) :- remove_nil(T1, T2).
+
+% Check if the second list consists of every element in the first list written twice
+twice([], []).
+twice([H|T1], [H,H|T2]) :- twice(T1, T2).
+
+% Check whether the first list is identical to the second list, 
+% except that the first and last elements are exchanged
+swapfl([], []).
+swapfl([H1|T1], [H2|T2]):-
+	reverse(T1, [L1|R1]),
+	reverse(T2, [L2|R2]),
+	H1 = L2,
+	L1 = H2,
+	R1 = R2.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%% SET / QUEUE %%%%%%%%%%%%%%%%%%%
