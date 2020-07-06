@@ -55,7 +55,7 @@ ostrich(pippo).
 % Head must be instantiated to a non-numeric term
 
 % Vanilla meta-interpreter
-% solve((b, c, d)) calls solve(a) and solve((c, d))
+% solve((b, c, d)) calls solve(b) and solve((c, d))
 solve(true) :- !.
 solve((A,B)) :- !, solve(A), solve(B). 
 solve(A) :- clause(A, B), solve(B).

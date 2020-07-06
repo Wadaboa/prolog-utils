@@ -17,6 +17,23 @@ even(X) :-
 odd(X) :-
     not(even(X)).
 
+% Factorial
+fatt(0, 1) :- !.
+fatt(X, Y) :- 
+    X1 is X - 1, 
+    fatt(X1, Y1),
+    Y is X * Y1.
+
+% Tail-recursive factorial
+fatt_tr(X, Y) :- 
+    fatt_tr(X, Y, 1).
+fatt_tr(0, Y, Y) :- 
+    !.
+fatt_tr(X, Y, A) :- 
+    A1 is A * X, 
+    X1 is X - 1, 
+    fatt_tr(X1, Y, A1).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%% LIST %%%%%%%%%%%%%%%%%%%%%%
@@ -91,6 +108,13 @@ reverse([], []).
 reverse([XH|XT], Y) :-
     reverse(XT, Z),
     my_append(Z, [XH], Y).
+
+% Tail-recursive reverse
+reverse_tr(L, R) :- 
+    reverse_tr(L, R, []).
+reverse_tr([], R, R).
+reverse_tr([H|T], R, A) :- 
+    reverse_tr(T, R, [H|A]).
 
 % Lists elementwise difference
 elementwise_diff([], [], []).
@@ -275,6 +299,19 @@ flatten(X, [X]) :-
     not(list(X)).
 flatten([], []) :-
     !.
+
+% Tail-recursive flatten
+flatten_tr(L, F) :- 
+    flatten_tr(L, F1, []), 
+    reverse(F1, F).
+flatten_tr([], F, F).
+flatten_tr([H|T], F, A) :- 
+    is_list(H), 
+    !, 
+    flatten_tr(H, F1, A), 
+    flatten_tr(T, F1, F).
+flatten_tr([H|T1], F, A) :- 
+    flatten_tr(T1, F, [H|A]). 
 
 % Bogo sort
 bogo_sort(X, S) :-
