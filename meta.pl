@@ -19,6 +19,8 @@ verify(Pred) :- call(Pred), !.
 % setof(X, p(X), S). (No repetitions)
 % bagof(X, p(X), S). (Possible repetitions)
 % findall(X, p(X1, ..., XN), S). (= bagof(X1, (X2, ..., XN)^p(X1, ..., XN), S).)
+% setof(X, p(X, Y), S). returns "The set of X's s.t. p(X, Y) holds", where Y is binded to every possible value.
+% setof(X, Y^p(X, Y), S). returns "The set of X's s.t. there exists a Y s.t. p(X, Y) holds", without binding Y.
 father(giovanni, mario). 
 father(giovanni, giuseppe). 
 father(mario, paola). 
@@ -123,6 +125,20 @@ solve_print_tab(A, D) :-
 solve_sub(true, []) :- !. 
 solve_sub((A,B), S) :- !, solve_sub(A, S1), solve_sub(B, S2), append(S1, S2, S).
 solve_sub(A, [A|T]) :- clause(A,B), solve_sub(B, T).
+
+% Meta-interpreter with depth-limited search
+solve_dls(G, M) :- solve_dls(G, 0, M).
+solve_dls(true, _, _) :- !.
+solve_dls(_, D, L) :- D > L, !, fail.
+solve_dls((A,B), D, L) :- !, solve_dls(A, D, L), solve_dls(B, D, L).
+solve_dls(A, _, _) :- predicate_property(A, built_in), !, call(A).
+solve_dls(A, D, L) :- clause(A,B), D1 is D + 1, solve_dls(B, D1, L).
+
+natnum(0).
+natnum(s(X)) :- natnum(X).
+
+% Meta-interpreter with iterative-deepening
+solve_id(G) :- length(_, N), solve_dls(G, N).
 
 % Dinamically modify the KB (It alters its declarative semantic)
 % assert(T). (Clause T is added in an unspecified position in the KB)
