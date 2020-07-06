@@ -1,3 +1,7 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% META PREDICATE %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Logical implication
 % implies(a(1), b(1)). should return false.
 implies(a(X), b(Y)) :- call(a(X)), call(\+b(Y)), !, fail.
@@ -53,6 +57,11 @@ ostrich(pippo).
 % clause(Head, Body). 
 % Unification with a clause whose head is Head and whose body is Body
 % Head must be instantiated to a non-numeric term
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% META INTERPRETER %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Vanilla meta-interpreter
 % solve((b, c, d)) calls solve(b) and solve((c, d))
@@ -146,6 +155,11 @@ solve_id(G) :- length(_, N), solve_dls(G, N).
 % assertz(T). (Clause T is added at the bottom of the KB)
 % retract(T). (The first clause that unifies with T is removed from the KB) -> e.g. retract((b(X) :- BODY)), retract(a(X)).
 % abolish(T, N) (Remove every clause in the KB with arity N that unifies with T) -> e.g. abolish(a, 1).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% GRAMMAR %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Context-free grammar parser
 % G -> I + G | I
