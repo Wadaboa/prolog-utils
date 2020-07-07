@@ -58,6 +58,15 @@ ostrich(pippo).
 % Unification with a clause whose head is Head and whose body is Body
 % Head must be instantiated to a non-numeric term
 
+% Count the number of predicates in the KB with the given head
+how_many(P, N) :- predicates(P, L), length(L, N).
+
+predicates(P, [P|T]) :- clause(P, B), retract((P:-B)), !, predicates(P, T).
+predicates(P, []).
+
+% Count the number of predicates in the KB with the given head, using bagof
+how_many_bo(P, N) :- bagof(P, B^clause(P, B), S), length(S, N).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%% META INTERPRETER %%%%%%%%%%%%%%%%
